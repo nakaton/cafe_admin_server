@@ -8,7 +8,7 @@ const app = express();
 // Init middleware
 app.use(logger);
 
-// Set static folder. 'use' function is used for middleware
+// Set static folder.
 app.use(express.static(path.join(__dirname, 'static')));
 
 app.get('/api/members', (req, res) => {
