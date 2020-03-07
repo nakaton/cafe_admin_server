@@ -1,0 +1,2 @@
+
+/* Common method for uses */

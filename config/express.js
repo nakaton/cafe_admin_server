@@ -18,10 +18,10 @@ module.exports = () => {
     app.use(bodyParser.raw({type: 'image/png', limit: '50mb' }));
     app.use(multer({dest: process.env.PHOTO_DIRECTORY || './storage/photos/'}).single('photo'));
     
-    // Init Route
-    // require('')
+    // Init Route for RESTful API request
+    require('../app/routes/application.routes')(app);
 
-    // Test for express work.
+    // Test for Express work.
     app.get('/', (req, res) => {
         res.send({'message': 'Hello World!'})
     })
