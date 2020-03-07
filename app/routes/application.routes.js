@@ -7,6 +7,12 @@ module.exports = (app) => {
     app.route(app.rootUrl + '/category')
         .post(category.addCategory);
 
+    app.route(app.rootUrl + '/category/:cd')
+        .put(category.updateCategory);
+
+    app.route(app.rootUrl + '/category/:cd')
+        .delete(category.deleteCategory);
+
     // app.route(app.rootUrl + '/products')
     //     .get(product.getProducts);
 
