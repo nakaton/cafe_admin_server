@@ -2,17 +2,24 @@ const dbConnection = require('../../config/dbConnection');
 const Utils = require('../utils/utils');
 
 
-/* Get Food Categories from DB */
-exports.getCategories = async (req, res) => {
-    let sqlCommand = "select category_cd as categoryCd, " + 
-                            "category_name as categoryName, " + 
-                            "parent_category_cd as parentCategoryCd " + 
-                       "from category;";
+/* Get Products from DB */
+exports.getProducts = async (req, res) => {
+    let sqlCommand = "select product.product_cd as productCd, " + 
+                            "product.product_name as productName, " + 
+                            "product.category_cd as categoryCd, " + 
+                            "category.category_name as categoryName, " + 
+                            "product.unit_cost as unitCost, " + 
+                            "product.selling_price as sellingPrice, " + 
+                            "product.photo_filename as photoFileName, " + 
+                            "product.comments " + 
+                        "from product " + 
+                        "left join category on product.category_cd = category.category_cd;";
 
     console.log(`==> Select SQL: ${sqlCommand}`);
 
     try {
         const result = await dbConnection.executeSql(sqlCommand);
+
         Utils.setUpResponse(res, "OK", result);
 
     } catch (err) {
@@ -25,10 +32,7 @@ exports.getCategories = async (req, res) => {
 
 /* Get Food Category by code */
 exports.getCategoryByCd = async (categoryCd) => {
-    let sqlCommand = "select category_cd as categoryCd, " + 
-                            "category_name as categoryName, " + 
-                            "parent_category_cd as parentCategoryCd " + 
-                       "from category where category_cd = ?;";
+    let sqlCommand = "select category_cd, category_name, parent_category_cd from category where category_cd = ?;";
 
     console.log(`==> Select SQL: ${sqlCommand}`);
 
@@ -36,11 +40,14 @@ exports.getCategoryByCd = async (categoryCd) => {
 
     try {
         const result = await dbConnection.executeSql(sqlCommand, values);
+
         return result;
 
     } catch (err) {
         if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
+        res.statusMessage = 'Bad Request';
+        res.status(400)
+            .send();
         return;
     }
 };
@@ -58,19 +65,22 @@ exports.addCategory = async (req, res) => {
         postDate
     ];
 
-    let sqlCommand = "insert into category " + 
-                            "(category_cd, category_name, parent_category_cd, create_person, create_date ) " + 
-                     "values (?,?,?,?,?)";
+    let sqlCommand = "insert into category "
+        + "(category_cd, category_name, parent_category_cd, create_person, create_date ) " 
+        + "values (?,?,?,?,?)";
 
     console.log(`==> Insert SQL: ${sqlCommand}`);
 
     try {
         const result = await dbConnection.executeSql(sqlCommand, values);
-        Utils.setUpResponse(res, "Created", "");
 
+        res.statusMessage = 'Created';
+        res.status(201).send();
     } catch (err) {
         if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
+        res.statusMessage = 'Bad Request';
+        res.status(400)
+            .send();
         return;
     }
 };
@@ -82,7 +92,9 @@ exports.updateCategory = async (req, res) => {
     let data = await this.getCategoryByCd(categoryCd);
 
     if(data == undefined || data.length == 0){
-        Utils.setUpResponse(res, "Not Found", "");
+        res.statusMessage = 'Not Found';
+        res.status(404)
+            .send();
         return;
     }
 
@@ -95,22 +107,21 @@ exports.updateCategory = async (req, res) => {
         categoryCd
     ];
 
-    let sqlCommand = "update category " + 
-                        "set category_name = ?, " + 
-                            "parent_category_cd = ?, " + 
-                            "update_person = ?, " + 
-                            "update_date = ? " + 
-                      "where category_cd = ?; ";
+    let sqlCommand = "update category "
+        + "set category_name = ?, parent_category_cd = ?, update_person = ?, update_date = ? where category_cd = ?; ";
 
     console.log(`==> Update SQL: ${sqlCommand}`);
 
     try {
         const result = await dbConnection.executeSql(sqlCommand, values);
-        Utils.setUpResponse(res, "OK", result);
 
+        res.statusMessage = 'OK';
+        res.status(200).send();
     } catch (err) {
         if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
+        res.statusMessage = 'Bad Request';
+        res.status(400)
+            .send();
         return;
     }
 }
@@ -127,11 +138,14 @@ exports.deleteCategory = async (req, res) => {
 
     try {
         const result = await dbConnection.executeSql(sqlCommand, values);
-        Utils.setUpResponse(res, "OK", result);
 
+        res.statusMessage = 'OK';
+        res.status(200).send();
     } catch (err) {
         if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
+        res.statusMessage = 'Bad Request';
+        res.status(400)
+            .send();
         return;
     }
 }
