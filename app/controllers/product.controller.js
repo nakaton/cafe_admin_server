@@ -1,4 +1,3 @@
-const dbConnection = require('../../config/dbConnection');
 const Utils = require('../utils/utils');
 
 
@@ -46,7 +45,7 @@ exports.getProductByCd = async (productCd) => {
     let values = [productCd];
 
     //No Response for this function
-    return await Utils.dataOperation("", "", sqlCommand, values, "");
+    return await Utils.dataOperation("", "", sqlCommand, values);
 };
 
 

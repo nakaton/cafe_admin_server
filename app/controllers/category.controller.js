@@ -1,4 +1,3 @@
-const dbConnection = require('../../config/dbConnection');
 const Utils = require('../utils/utils');
 
 
@@ -33,7 +32,7 @@ exports.getCategoryByCd = async (categoryCd) => {
     let values = [categoryCd];
 
     //No Response for this function
-    return await Utils.dataOperation("", "", sqlCommand, values, "");
+    return await Utils.dataOperation("", "", sqlCommand, values);
 };
 
 

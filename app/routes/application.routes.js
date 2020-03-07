@@ -1,5 +1,6 @@
 const category = require('../controllers/category.controller');
 const product = require('../controllers/product.controller');
+const order = require('../controllers/order.controller');
 
 module.exports = (app) => {
     // Route for category
@@ -29,7 +30,19 @@ module.exports = (app) => {
         .delete(product.deleteProduct);
 
 
-    // app.route(app.rootUrl + '/orders')
-    //     .get(order.getOrders);
-    
+    // Route for Order
+    app.route(app.rootUrl + '/orders')
+        .get(order.getOrders);
+
+    // app.route(app.rootUrl + '/order/:id')
+    //     .get(order.getOrderById);
+
+    // app.route(app.rootUrl + '/order')
+    //     .post(order.addOrder);
+
+    // app.route(app.rootUrl + '/order/:id')
+    //     .put(order.updateOrderStatus);
+
+    // app.route(app.rootUrl + '/order/:id')
+    //     .delete(order.deleteOrder);
 }
