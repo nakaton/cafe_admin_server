@@ -19,14 +19,14 @@ module.exports = (app) => {
     app.route(app.rootUrl + '/products')
         .get(product.getProducts);
 
-    // app.route(app.rootUrl + '/product')
-    //     .post(product.addProduct);
+    app.route(app.rootUrl + '/product')
+        .post(product.addProduct);
 
-    // app.route(app.rootUrl + '/product/:cd')
-    //     .put(product.updateProduct);
+    app.route(app.rootUrl + '/product/:cd')
+        .put(product.updateProduct);
 
-    // app.route(app.rootUrl + '/product/:cd')
-    //     .delete(product.deleteProduct);
+    app.route(app.rootUrl + '/product/:cd')
+        .delete(product.deleteProduct);
 
 
     // app.route(app.rootUrl + '/orders')
