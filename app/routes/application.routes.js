@@ -34,15 +34,15 @@ module.exports = (app) => {
     app.route(app.rootUrl + '/orders')
         .get(order.getOrders);
 
-    // app.route(app.rootUrl + '/order/:id')
-    //     .get(order.getOrderById);
+    app.route(app.rootUrl + '/order/:id')
+        .get(order.getOrderById);
 
-    // app.route(app.rootUrl + '/order')
-    //     .post(order.addOrder);
+    app.route(app.rootUrl + '/order')
+        .post(order.addOrder);
 
-    // app.route(app.rootUrl + '/order/:id')
-    //     .put(order.updateOrderStatus);
+    app.route(app.rootUrl + '/order/:id')
+        .patch(order.updateOrderStatus);
 
-    // app.route(app.rootUrl + '/order/:id')
-    //     .delete(order.deleteOrder);
+    app.route(app.rootUrl + '/order/:id')
+        .delete(order.deleteOrder);
 }

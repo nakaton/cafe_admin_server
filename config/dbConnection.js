@@ -24,8 +24,8 @@ exports.executeSql = async (sql) => {
         let result = await pool.query(sql);
         return result;
     } catch (error) {
-        console.error(err.message);
-        throw err;
+        console.error(error.message);
+        throw error;
     }
 }
 
@@ -35,7 +35,7 @@ exports.executeSql = async (sql, values) => {
         let result = await pool.query(sql, values);
         return result;
     } catch (error) {
-        console.error(err.message);
-        throw err;
+        console.error(error.message);
+        throw error;
     }
 }

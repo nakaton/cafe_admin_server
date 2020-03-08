@@ -34,9 +34,9 @@ exports.dataOperation = async (req, res, sqlCommand, values) => {
         const result = await dbConnection.executeSql(sqlCommand, values);
         return result;
 
-    } catch (err) {
-        if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
+    } catch (error) {
+        if (!error.hasBeenLogged) console.error(error);
+        this.setUpResponse(res, "Bad Request", "");
         return;
     }
 }

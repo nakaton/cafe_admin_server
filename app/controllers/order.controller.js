@@ -77,6 +77,7 @@ prepareSqlAndExecute = async (req, res) =>{
     let dateFrom = req.query.dateFrom;
     let dateTo = req.query.dateTo;
     let orderStatus = req.query.orderStatus;
+    let orderNo = req.params.id;
 
     let values = [];
 
@@ -96,6 +97,11 @@ prepareSqlAndExecute = async (req, res) =>{
                         "where 1 = 1 ";
 
     // Add SQL condition by query params
+    if(orderNo != undefined && orderNo != ""){
+        sqlCommand += " and SellsOrder.order_no = ?"
+        values.push(orderNo);
+    }
+
     if(dateFrom != undefined && dateFrom != ""){
         sqlCommand += " and SellsOrder.order_time >= ?";
         values.push(dateFrom);
@@ -120,65 +126,75 @@ prepareSqlAndExecute = async (req, res) =>{
 }
 
 /* 
-Description: Get Product by product code 
+Description: Get Order by order id 
 */
-exports.getProductByCd = async (productCd) => {
-    let sqlCommand = "select product.product_cd as productCd, " + 
-                            "product.product_name as productName, " + 
-                            "product.category_cd as categoryCd, " + 
-                            "category.category_name as categoryName, " + 
-                            "product.unit_cost as unitCost, " + 
-                            "product.selling_price as sellingPrice, " + 
-                            "product.photo_filename as photoFileName, " + 
-                            "product.comments " + 
-                        "from product " + 
-                        "left join category on product.category_cd = category.category_cd " + 
-                       "where product.product_cd = ?;";
+exports.getOrderById = async (req, res) => {
+    // Get order raw data
+    let results = await this.getOrders(req, res);
 
-    console.log(`==> Select SQL: ${sqlCommand}`);
-
-    let values = [productCd];
-
-    //No Response for this function
-    return await Utils.dataOperation("", "", sqlCommand, values, "");
+    Utils.setUpResponse(res, "OK", results);
 };
 
 
 /* 
-Description: Create new product 
+Description: Create new Order 
 */
-exports.addProduct = async (req, res) => {
-
+exports.addOrder = async (req, res) => {
+    // TODO: Need to figure out Order register logic again.
     let postDate = new Date();
-    let values = [
-        req.body.productCd,
-        req.body.productName,
-        req.body.categoryCd,
-        req.body.unitCost,
-        req.body.sellingPrice,
-        req.body.photoFileName,
+    let valuesOrder = [
+        req.body.orderNo,
+        req.body.customerId,
+        postDate,
+        amount,
+        "R",
+        "Received",
         req.body.comments,
         req.body.userName,
         postDate
     ];
 
-    let sqlCommand = "insert into product " + 
-                            "(product_cd, product_name, category_cd, unit_cost, selling_price, photo_filename, comments, create_person, create_date ) " + 
+    // TODO: add loop for dealing with order multiple items 
+    let valuesOrderDetail = [
+        req.body.orderNo,
+        req.body.productCd,
+        req.body.qty,
+        "R",
+        "Received",
+        req.body.comments,
+        req.body.userName,
+        postDate
+    ];
+
+    let sqlCommandOrder = "insert into SellsOrder " + 
+                            "(order_no, customer_id, order_time, amount, order_status, order_status_name, comments, create_person, create_date ) " + 
                      "values (?,?,?,?,?,?,?,?,?)";
 
-    console.log(`==> Insert SQL: ${sqlCommand}`);
+    console.log(`==> Insert SQL: ${sqlCommandOrder}`);
+
+    await Utils.dataOperation(req, res, sqlCommandOrderDetail, valuesOrder);
+
+
+    let sqlCommandOrderDetail = "insert into OrderDetail " + 
+                            "(order_no, product_cd, qty, product_status, product_status_name, comments, create_person, create_date ) " + 
+                     "values (?,?,?,?,?,?,?,?,?)";
+
+    console.log(`==> Insert SQL: ${sqlCommandOrderDetail}`);
 
     //Response for POST success operation is 'Created'
-    await Utils.dataOperationToResponse(req, res, sqlCommand, values, "Created");
+    await Utils.dataOperationToResponse(req, res, sqlCommandOrderDetail, valuesOrderDetail, "Created");
 };
 
 /* 
-Description: Update Product by product code
+Description: Update Order status by order no
+Status: R Received
+        P Pending
+        D Done
 */
-exports.updateProduct = async (req, res) => {
-    let productCd = req.params.cd;
+exports.updateOrderStatus = async (req, res) => {
+    let orderNo = req.params.id;
 
-    let data = await this.getProductByCd(productCd);
+    let data = await prepareSqlAndExecute(req, res);
 
     if(data == undefined || data.length == 0){
         Utils.setUpResponse(res, "Not Found", "");
@@ -187,46 +203,55 @@ exports.updateProduct = async (req, res) => {
 
     let udpateDate = new Date();
     let values = [
-        req.body.productName,
-        req.body.categoryCd,
-        req.body.unitCost,
-        req.body.sellingPrice,
-        req.body.photoFileName,
-        req.body.comments,
-        req.body.userName,
+        req.body.orderStatus,
+        req.body.orderStatusName,
+        "admin",
         udpateDate,
-        productCd
+        orderNo
     ];
 
-    let sqlCommand = "update product " + 
-                        "set product_name = ?, " + 
-                            "category_cd = ?, " + 
-                            "unit_cost = ?, " + 
-                            "selling_price = ?, " + 
-                            "photo_filename = ?, " + 
-                            "comments = ?, " + 
+    let sqlCommandOrderDetail = "update OrderDetail " + 
+                        "set product_status = ?, " + 
+                            "product_status_name = ?, " + 
                             "update_person = ?, " + 
                             "update_date = ? " + 
-                      "where product_cd = ?; ";
+                      "where order_no = ?; ";
 
-    console.log(`==> Update SQL: ${sqlCommand}`);
+    console.log(`==> Update SQL: ${sqlCommandOrderDetail}`);
+
+    await Utils.dataOperation(req, res, sqlCommandOrderDetail, values);
+
+
+    let sqlCommandOrder = "update SellsOrder " + 
+                        "set order_status = ?, " + 
+                            "order_status_name = ?, " + 
+                            "update_person = ?, " + 
+                            "update_date = ? " + 
+                      "where order_no = ?; ";
+
+    console.log(`==> Update SQL: ${sqlCommandOrder}`);
 
     //Response for UPDATE success operation is 'OK'
-    await Utils.dataOperationToResponse(req, res, sqlCommand, values, "OK");
+    await Utils.dataOperationToResponse(req, res, sqlCommandOrder, values, "OK");
 }
 
 /* 
-Description: Delete Product by product code
+Description: Delete Order by Order No
 */
-exports.deleteProduct = async (req, res) => {
-    let productCd = req.params.cd;
+exports.deleteOrder = async (req, res) => {
+    let orderNo = req.params.id;
+    let values = [orderNo];
 
-    let sqlCommand = "delete from product where product_cd = ?; ";
+    let sqlCommandOrderDetail = "delete from OrderDetail where order_no = ?; ";
 
-    console.log(`==> Delete SQL: ${sqlCommand}`);
+    console.log(`==> Delete SQL: ${sqlCommandOrderDetail}`);
+    await Utils.dataOperation(req, res, sqlCommandOrderDetail, values);
 
-    let values = [productCd];
+    let sqlCommandOrder = "delete from SellsOrder where order_no = ?; ";
+
+    console.log(`==> Delete SQL: ${sqlCommandOrder}`);
+
 
     //Response for DELETE success operation is 'OK'
-    await Utils.dataOperationToResponse(req, res, sqlCommand, values, "OK");
+    await Utils.dataOperationToResponse(req, res, sqlCommandOrder, values, "OK");
 }
