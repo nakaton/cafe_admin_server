@@ -1,6 +1,8 @@
 const category = require('../controllers/category.controller');
 const product = require('../controllers/product.controller');
 const order = require('../controllers/order.controller');
+const user = require('../controllers/user.controller');
+
 
 module.exports = (app) => {
     // Route for category
@@ -45,4 +47,8 @@ module.exports = (app) => {
 
     app.route(app.rootUrl + '/order/:id')
         .delete(order.deleteOrder);
+
+    // Route for User
+    app.route(app.rootUrl + '/login')
+        .get(user.login);
 }
