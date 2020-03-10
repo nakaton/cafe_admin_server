@@ -2,7 +2,7 @@ const Utils = require('../utils/utils');
 
 
 /* 
-Description: User Login 
+Description: User Login
 */
 exports.login = async (req, res) => {
     let userName = req.body.username;
