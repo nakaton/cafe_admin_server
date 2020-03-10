@@ -1,5 +1,8 @@
 const category = require('../controllers/category.controller');
 const product = require('../controllers/product.controller');
+const order = require('../controllers/order.controller');
+const user = require('../controllers/user.controller');
+
 
 module.exports = (app) => {
     // Route for category
@@ -19,17 +22,33 @@ module.exports = (app) => {
     app.route(app.rootUrl + '/products')
         .get(product.getProducts);
 
-    // app.route(app.rootUrl + '/product')
-    //     .post(product.addProduct);
+    app.route(app.rootUrl + '/product')
+        .post(product.addProduct);
 
-    // app.route(app.rootUrl + '/product/:cd')
-    //     .put(product.updateProduct);
+    app.route(app.rootUrl + '/product/:cd')
+        .put(product.updateProduct);
 
-    // app.route(app.rootUrl + '/product/:cd')
-    //     .delete(product.deleteProduct);
+    app.route(app.rootUrl + '/product/:cd')
+        .delete(product.deleteProduct);
 
 
-    // app.route(app.rootUrl + '/orders')
-    //     .get(order.getOrders);
-    
+    // Route for Order
+    app.route(app.rootUrl + '/orders')
+        .get(order.getOrders);
+
+    app.route(app.rootUrl + '/order/:id')
+        .get(order.getOrderById);
+
+    app.route(app.rootUrl + '/order')
+        .post(order.addOrder);
+
+    app.route(app.rootUrl + '/order/:id')
+        .patch(order.updateOrderStatus);
+
+    app.route(app.rootUrl + '/order/:id')
+        .delete(order.deleteOrder);
+
+    // Route for User
+    app.route(app.rootUrl + '/login')
+        .get(user.login);
 }

@@ -1,8 +1,9 @@
-const dbConnection = require('../../config/dbConnection');
 const Utils = require('../utils/utils');
 
 
-/* Get Food Categories from DB */
+/* 
+Description: Get Food Categories from DB 
+*/
 exports.getCategories = async (req, res) => {
     let sqlCommand = "select category_cd as categoryCd, " + 
                             "category_name as categoryName, " + 
@@ -11,19 +12,15 @@ exports.getCategories = async (req, res) => {
 
     console.log(`==> Select SQL: ${sqlCommand}`);
 
-    try {
-        const result = await dbConnection.executeSql(sqlCommand);
-        Utils.setUpResponse(res, "OK", result);
-
-    } catch (err) {
-        if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
-        return;
-    }
+    //Response for GET success operation is 'OK'
+    let values = [];
+    await Utils.dataOperationToResponse(req, res, sqlCommand, values, "OK");
 };
 
 
-/* Get Food Category by code */
+/* 
+Description: Get Food Category by category code 
+*/
 exports.getCategoryByCd = async (categoryCd) => {
     let sqlCommand = "select category_cd as categoryCd, " + 
                             "category_name as categoryName, " + 
@@ -34,19 +31,14 @@ exports.getCategoryByCd = async (categoryCd) => {
 
     let values = [categoryCd];
 
-    try {
-        const result = await dbConnection.executeSql(sqlCommand, values);
-        return result;
-
-    } catch (err) {
-        if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
-        return;
-    }
+    //No Response for this function
+    return await Utils.dataOperation("", "", sqlCommand, values);
 };
 
 
-/* Create new food category */
+/* 
+Description: Create new food category 
+*/
 exports.addCategory = async (req, res) => {
 
     let postDate = new Date();
@@ -64,18 +56,14 @@ exports.addCategory = async (req, res) => {
 
     console.log(`==> Insert SQL: ${sqlCommand}`);
 
-    try {
-        const result = await dbConnection.executeSql(sqlCommand, values);
-        Utils.setUpResponse(res, "Created", "");
-
-    } catch (err) {
-        if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
-        return;
-    }
+    //Response for POST success operation is 'Created'
+    await Utils.dataOperationToResponse(req, res, sqlCommand, values, "Created");
 };
 
-/* Update Category */
+
+/* 
+Description: Update Category by category code
+*/
 exports.updateCategory = async (req, res) => {
     let categoryCd = req.params.cd;
 
@@ -104,18 +92,14 @@ exports.updateCategory = async (req, res) => {
 
     console.log(`==> Update SQL: ${sqlCommand}`);
 
-    try {
-        const result = await dbConnection.executeSql(sqlCommand, values);
-        Utils.setUpResponse(res, "OK", result);
-
-    } catch (err) {
-        if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
-        return;
-    }
+    //Response for UPDATE success operation is 'OK'
+    await Utils.dataOperationToResponse(req, res, sqlCommand, values, "OK");
 }
 
-/* Delete Category */
+
+/* 
+Description: Delete Category by category code
+*/
 exports.deleteCategory = async (req, res) => {
     let categoryCd = req.params.cd;
 
@@ -125,13 +109,6 @@ exports.deleteCategory = async (req, res) => {
 
     let values = [categoryCd];
 
-    try {
-        const result = await dbConnection.executeSql(sqlCommand, values);
-        Utils.setUpResponse(res, "OK", result);
-
-    } catch (err) {
-        if (!err.hasBeenLogged) console.error(err);
-        Utils.setUpResponse(res, "Bad Request", "");
-        return;
-    }
+    //Response for DELETE success operation is 'OK'
+    await Utils.dataOperationToResponse(req, res, sqlCommand, values, "OK");
 }
